@@ -14,7 +14,7 @@ router.get("/:id", verifyToken, (req, res) => {
       return res.status(500).json({ error: "Error al obtener el taller" });
     }
     if (result.length === 0) {
-      return res.status(404).json({ error: "Este Taller no existe" });
+      return res.status(409).json({ error: "Este Taller no existe" });
     }
     res.json(result[0]);
   });
@@ -122,7 +122,7 @@ router.put("/:id", verifyToken, (req, res) => {
       return res.status(500).json({ error: "Error al actualizar el taller" });
     }
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Taller no encontrado" });
+      return res.status(409).json({ error: "Taller no encontrado" });
     }
     res.status(200).json({
       message: "Taller con ID " + id + " modificado exitosamente ",
@@ -132,11 +132,21 @@ router.put("/:id", verifyToken, (req, res) => {
 //Metodo delete para eliminar un registro
 router.delete("/:id", verifyToken, (req, res) => {
   const { id } = req.params;
+  const search_query = "select count(*) as contador from talleres where tall_id = ?";
+  db.query(search_query, [id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Error al interno verificar el mantenimiento" });
+    }
+    if (result[0].contador > 0) {
+      return res.status(409).json({ error: "El taller no se puede eliminar ya que mantiene un mantenimiento agregado" });
+    }
+  });
   const query = "delete from talleres where tall_id = ?";
   db.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: "Error al eliminar el taller" });
+      return res.status(500).json({ error: "Error al eliminar" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Taller no encontrado" });
