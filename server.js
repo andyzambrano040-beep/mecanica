@@ -11,11 +11,13 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const vehiculosRoutes = require('./routes/vehiculos');
 const talleresRoutes = require('./routes/talleres');
+const propietariosRoutes = require('./routes/propietarios');
 
 //usar las rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculosRoutes);
 app.use('/api/talleres', talleresRoutes);
+app.use('/api/propietarios', propietariosRoutes);
 
 //Rutas de ejemplos
 app.get('/', (req, res) => {
